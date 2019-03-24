@@ -6,23 +6,26 @@ import {
   Switch,
   TextInput,
   Platform,
-  Button,
+  Button
 } from 'react-native';
 
 import { MaterialIcons } from '@expo/vector-icons';
+import DueDate from "./DueDate"
 
 const TINT_COLOR = 'rgb(4, 159, 239)';
 
 export default class AddTodo extends React.Component {
   state = {
+    id: -1,
     text: '',
-    remindMe: false,
+    done: false,
+    dueDate:new Date()
   };
   _save = () => {
-    //console.log("PASSO 1")
     const newTodo = {
       text: this.state.text,
-      done: this.state.remindMe,
+      done: this.state.done,
+      dueDate:this.state.dueDate
     };
     this.props.navigation.state.params.addNewTodo
       ? this.props.navigation.state.params.addNewTodo(newTodo)
@@ -31,55 +34,64 @@ export default class AddTodo extends React.Component {
   };
 
   _edit = () => {
-    //console.log("PASSO 1 - ",this.props.navigation.state.params.currentTodo);
-    let obj = {...this.state,OLDtext:this.props.navigation.state.params.currentTodo.text,OLDdone:this.props.navigation.state.params.currentTodo.done,};
-
     this.props.navigation.state.params.editTodo
-      ? this.props.navigation.state.params.editTodo(obj)
+      ? this.props.navigation.state.params.editTodo(this.state)
       : null;
     this.props.navigation.goBack();
   };
 
   _editCurrentTodo = item => {
-    this.setState({text:item.text,remindMe:item.remindMe})
+    this.setState({text:item.text,done:item.done})
   };
 
-  componentDidMount() {
+  _dateChange = value => {
+    //console.log("ADD_TODO - Valore ricevuto: ",value);
+    this.setState({ dueDate: value });
+  }
+
+  /* Non utilizzato perche' non permette l'assegnazione dentro lo state, poiche' ovviamente viene eseguito prima della render
+  componentDidMount() { 
+  } */
+
+  componentWillMount(){
     if (this.props.navigation.state.params.currentTodo) {
       // Qui siamo in modalita' editing
       this._editCurrentTodo(this.props.navigation.state.params.currentTodo);
       this.props.navigation.setParams({ saveFunc: this._edit });
+      this.setState({...this.props.navigation.state.params.currentTodo})
     }
     else{
       // Qui siamo in modalita' salvataggio
       this.props.navigation.setParams({ saveFunc: this._save });
     }
+   
   }
 
   render() {
+
     return (
       <View style={styles.wrapper}>
         <View style={[styles.todowrapper, { padding: 15 }]}>
           <TextInput
             value={this.state.text}
             style={[styles.textInputStyleOnAndroid, styles.label]}
-            placeholder="Name of the item"
+            placeholder="Inserisci il nome dell'oggetto"
             autoFocus
             underlineColorAndroid={TINT_COLOR}
             onChangeText={value => this.setState({ text: value })}
-            //onSubmitEnding  ---> PULSANTE SALVATAGGIO
             onSubmitEditing={this._save}
           />
         </View>
         <View style={styles.todowrapper}>
           <View style={styles.remindRow}>
-            <Text style={styles.label}>Remind me</Text>
+            <Text style={styles.label}>Ricordami</Text>
             <Switch
-              value={this.state.remindMe}
-              onValueChange={value => this.setState({ remindMe: value })}
+              value={this.state.done}
+              onValueChange={value => this.setState({ done: value })}
               onTintColor={TINT_COLOR}
             />
           </View>
+          <DueDate dueDate={this.state.dueDate} onDateChange={(item) => this._dateChange(item)} />
         </View>
       </View>
     );
