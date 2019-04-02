@@ -19,13 +19,15 @@ export default class AddTodo extends React.Component {
     id: -1,
     text: '',
     done: false,
-    dueDate:new Date()
+    dueDate:new Date(),
+    remindPhoto : "..."
   };
   _save = () => {
     const newTodo = {
       text: this.state.text,
       done: this.state.done,
-      dueDate:this.state.dueDate
+      dueDate: this.state.dueDate,
+      remindPhoto: this.state.remindPhoto
     };
     this.props.navigation.state.params.addNewTodo
       ? this.props.navigation.state.params.addNewTodo(newTodo)
@@ -76,7 +78,6 @@ export default class AddTodo extends React.Component {
             value={this.state.text}
             style={[styles.textInputStyleOnAndroid, styles.label]}
             placeholder="Inserisci il nome dell'oggetto"
-            autoFocus
             underlineColorAndroid={TINT_COLOR}
             onChangeText={value => this.setState({ text: value })}
             onSubmitEditing={this._save}

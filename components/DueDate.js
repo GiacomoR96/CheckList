@@ -72,7 +72,7 @@ export default class DueDate extends React.Component {
 
   renderIOSPicker = () => (
     <DatePickerIOS
-      date={this.props.dueDate}
+      date={new Date(this.props.dueDate)}
       onDateChange={newValue => this.props.onDateChange(newValue)}
     />
   );
